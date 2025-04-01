@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: aluno_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: alunos
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: aluno_api
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://user:password@db:5432/alunos
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    command: npm start
+
+volumes:
+  pg_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./pg_data
+      o: bind
+# This docker-compose file sets up a PostgreSQL database and a Node.js backend application.
